@@ -33,8 +33,24 @@ public class ProductService {
         productRepo.deleteById(id);
     }
 
+
     public List<Product> findByName(String name){
         return productRepo.findByNameContains(name);
     }
+
+    public Product update(Long id, Product product){
+        Product productExisting = productRepo.findById(id)
+        .orElseThrow(() -> new RuntimeException("Product Not Found : " + id));
+  
+        productExisting.setName(product.getName());
+        productExisting.setDescription(product.getDescription());
+        productExisting.setPrice(product.getPrice());
+        return productRepo.save(productExisting);
+    }
+
+    public boolean existById(Long id){
+        return productRepo.existsById(id);
+    }
+
     
 }
