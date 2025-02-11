@@ -1,5 +1,8 @@
 package com.demo_api.demo_api.controllers;
 
+import com.demo_api.demo_api.models.entity.Supplier;
+
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -31,7 +34,8 @@ public class ProductController {
     @Autowired
     private ProductService productService;
 
-
+    @Autowired
+    private ModelMapper modelMapper;
 
     @PostMapping("/create")
     public ResponseEntity<ResponseData<Product>> create(@Valid @RequestBody Product product, BindingResult result){
@@ -71,18 +75,18 @@ public ResponseEntity<ResponseData<Product>> update(
        if (validationResponse != null) {
         return validationResponse;
        }
+       Product existProduct = productService.findOne(id);
        // cek id tidal sama dengan yg ada di params
-       if (!productService.existById(id)) {
+       if (existProduct != null) {
            responseData.setStatus(false);
            responseData.getMessages().add("Product id " + id + " not found");
            responseData.setPayload(null);
            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(responseData);
        }
        // ambil data lama
-       Product existProduct = productService.findOne(id);
-       existProduct.setName(product.getName());
-       existProduct.setPrice(product.getPrice());
-       existProduct.setDescription(product.getDescription());
+       
+       modelMapper.map(responseData, existProduct);
+
        // masukan / timpa ke data baru
        Product updateProduct = productService.save(existProduct);
        responseData.setStatus(true);
@@ -90,6 +94,8 @@ public ResponseEntity<ResponseData<Product>> update(
        return ResponseEntity.status(HttpStatus.OK).body(responseData);
     }
 
+
+    
 
    @DeleteMapping("delete/{productId}")
     public ResponseEntity<String> removeOne(@PathVariable("productId") Long productId) {
@@ -100,6 +106,11 @@ public ResponseEntity<ResponseData<Product>> update(
         
         productService.removeOne(productId);
         return ResponseEntity.ok("Product with ID " + productId + " successfully deleted.");
+    }
+
+    @PostMapping("/product/{id}/supplier")
+    public void addSupplier(@RequestBody Supplier supplier, @PathVariable("id") Long productId){
+        productService.addSupplier(supplier, productId);
     }
 
 

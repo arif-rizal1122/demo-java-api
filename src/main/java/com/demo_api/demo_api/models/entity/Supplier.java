@@ -14,12 +14,22 @@ import lombok.Setter;
 import java.io.Serializable;
 import java.util.Set;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+
+// import com.fasterxml.jackson.annotation.JsonBackReference;
+
+
 @Table(name = "tbl_suppliers")
 @NoArgsConstructor
 @AllArgsConstructor
 @Setter
 @Getter
 @Entity
+@JsonIdentityInfo(
+    generator = ObjectIdGenerators.PropertyGenerator.class,
+    property = "id"
+)
 public class Supplier implements Serializable{
     
     private static final long serialVersionUID = 1L;
@@ -38,6 +48,7 @@ public class Supplier implements Serializable{
     private String email;
 
     @ManyToMany(mappedBy = "suppliers")
+    // @JsonBackReference
     private Set<Product> products;
 
 }

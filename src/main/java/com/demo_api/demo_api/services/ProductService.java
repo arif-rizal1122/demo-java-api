@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.demo_api.demo_api.models.entity.Product;
+import com.demo_api.demo_api.models.entity.Supplier;
 import com.demo_api.demo_api.models.repository.ProductRepo;
 
 import jakarta.transaction.Transactional;
@@ -52,5 +53,13 @@ public class ProductService {
         return productRepo.existsById(id);
     }
 
+    public void  addSupplier(Supplier supplier, Long productId){
+        Product product = findOne(productId);
+        if (product == null) {
+            throw new RuntimeException("Product Id" + productId + " Not Found");
+        }
+        product.getSuppliers().add(supplier);
+        save(product);
+    }
     
 }
