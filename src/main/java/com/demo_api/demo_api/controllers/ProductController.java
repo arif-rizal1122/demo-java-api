@@ -2,6 +2,8 @@ package com.demo_api.demo_api.controllers;
 
 import com.demo_api.demo_api.models.entity.Supplier;
 
+import java.util.List;
+
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -12,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.demo_api.demo_api.dto.ResponseData;
+import com.demo_api.demo_api.dto.SearchData;
 import com.demo_api.demo_api.helpers.ValidationHelper;
 import com.demo_api.demo_api.models.entity.Product;
 import com.demo_api.demo_api.services.ProductService;
@@ -111,6 +114,28 @@ public ResponseEntity<ResponseData<Product>> update(
     @PostMapping("/product/{id}/supplier")
     public void addSupplier(@RequestBody Supplier supplier, @PathVariable("id") Long productId){
         productService.addSupplier(supplier, productId);
+    }
+
+
+    @PostMapping("/search/name")
+    public ResponseEntity<?> getProductByName(@RequestBody SearchData searchData) {
+        List<Product> products = productService.findByProductName(searchData.getSearchKey());
+    
+        if (products.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Product not found");
+        }
+        return ResponseEntity.ok(products);
+    }
+    
+
+    @GetMapping("/search-category/{categoryId}")
+    public List<Product> getProductByCategory(@PathVariable("categoryId") Long categoryId){
+        return productService.findByCategory(categoryId);
+    }
+
+    @GetMapping("/search-supplier/{supplierId}")
+    public List<Product> getProductBySupplier(@PathVariable("supplierId") Long supplierId){
+        return productService.findBySupplier(supplierId);
     }
 
 
