@@ -3,6 +3,7 @@ package com.demo_api.demo_api.services;
 import com.demo_api.demo_api.models.entity.Category;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.demo_api.demo_api.models.repository.CategoryRepo;
@@ -32,6 +33,16 @@ public class CategoryService {
     
     public void removeOne(Long id){
         categoryRepo.deleteById(id);
+    }
+
+
+    public Iterable<Category> findByNameContains(String name, Pageable pageable){
+        return categoryRepo.findByNameContains(name, pageable);
+    }
+
+
+    public Iterable<Category> saveBatch(Iterable<Category> categories){
+        return categoryRepo.saveAll(categories);
     }
 
 

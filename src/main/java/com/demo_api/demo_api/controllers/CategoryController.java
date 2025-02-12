@@ -1,7 +1,12 @@
 package com.demo_api.demo_api.controllers;
 
+import java.util.Arrays;
+
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -15,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.demo_api.demo_api.dto.CategoryData;
 import com.demo_api.demo_api.dto.ResponseData;
+import com.demo_api.demo_api.dto.SearchData;
 import com.demo_api.demo_api.helpers.ValidationHelper;
 import com.demo_api.demo_api.models.entity.Category;
 import com.demo_api.demo_api.services.CategoryService;
@@ -83,6 +89,44 @@ public class CategoryController {
         responseData.setPayload(updateCategory);
         return ResponseEntity.status(HttpStatus.OK).body(responseData);
     }
+
+
+    @GetMapping("/search/{size}/{page}")
+    public Iterable<Category> findByName(
+        @RequestBody SearchData searchData, 
+        @PathVariable("size") int size, 
+        @PathVariable("page") int page){
+
+        Pageable pageable = PageRequest.of(page, size);
+        return categoryService.findByNameContains(searchData.getSearchKey(), pageable);
+    }
+
+
+    @GetMapping("/search/{size}/{page}/{sort}")
+    public Iterable<Category> findByName(
+        @RequestBody SearchData searchData, 
+        @PathVariable("size") int size, 
+        @PathVariable("page") int page,
+        @PathVariable("sort") String sort){
+
+        Pageable pageable = PageRequest.of(page, size, Sort.by("id"));
+        if (sort.equalsIgnoreCase("desc")) {
+            pageable= PageRequest.of(page, size, Sort.by("id").descending());
+        }
+        return categoryService.findByNameContains(searchData.getSearchKey(), pageable);
+    }
+
+
+    @PostMapping("create/batch")
+    public ResponseEntity<ResponseData<Iterable<Category>>> createBatch(@RequestBody Category[] categories){
+
+        ResponseData<Iterable<Category>> responseData = new ResponseData<>();
+        responseData.setPayload(categoryService.saveBatch(Arrays.asList(categories)));
+        responseData.setStatus(true);
+        
+        return ResponseEntity.status(HttpStatus.CREATED).body(responseData);
+    }  
+
 
 
 }
