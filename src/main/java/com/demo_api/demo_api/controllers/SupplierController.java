@@ -2,6 +2,8 @@ package com.demo_api.demo_api.controllers;
 
 import com.demo_api.demo_api.models.entity.Supplier;
 
+import java.util.List;
+
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -10,6 +12,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import com.demo_api.demo_api.dto.ResponseData;
+import com.demo_api.demo_api.dto.SearchData;
 import com.demo_api.demo_api.dto.SupplierData;
 import com.demo_api.demo_api.helpers.ValidationHelper;
 import com.demo_api.demo_api.services.SupplierService;
@@ -88,5 +91,26 @@ public class SupplierController {
      }
 
 
+     @PostMapping("/search/byEmail")
+     public Supplier findByEmail(@RequestBody SearchData searchData){
+          return supplierService.findByEmail(searchData.getSearchKey());
+     }
+
+     @PostMapping("/search/byName")
+     public List<Supplier> findByName(@RequestBody SearchData searchData){
+          return supplierService.findByName(searchData.getSearchKey());
+     }
+
+
+     @PostMapping("/search/nameWith")
+     public List<Supplier> findByNameWith(@RequestBody SearchData searchData){
+          return supplierService.findByNameStarWith(searchData.getSearchKey());
+     }
+
+
+     @PostMapping("/search/nameOrEmail")
+     public List<Supplier> findByNameOrEmail(@RequestBody SearchData searchData){
+          return supplierService.findByNameOrEmail(searchData.getSearchKey(), searchData.getOtherKey());
+     }
 
    }
